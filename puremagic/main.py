@@ -16,7 +16,8 @@ import os
 import json
 import binascii
 from itertools import chain
-from collections import namedtuple
+
+from puremagic.shared import PureMagic, PureError, PureMagicWithConfidence
 
 __author__ = "Chris Griffith"
 __version__ = "1.10"
@@ -28,26 +29,11 @@ __all__ = [
     "from_string",
     "from_stream",
     "ext_from_filename",
-    "PureError",
     "magic_footer_array",
     "magic_header_array",
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))
-
-MAGIC_INFO_TYPES = (
-    "byte_match",
-    "offset",
-    "extension",
-    "mime_type",
-    "name",
-)
-PureMagic = namedtuple("PureMagic", MAGIC_INFO_TYPES)  # type: ignore
-PureMagicWithConfidence = namedtuple("PureMagicWithConfidence", (MAGIC_INFO_TYPES + ("confidence",)))  # type: ignore
-
-
-class PureError(LookupError):
-    """Do not have that type of file in our databanks"""
 
 
 def _magic_data(filename=os.path.join(here, "magic_data.json")):
