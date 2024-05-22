@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from binascii import unhexlify
 from pathlib import Path
 from sys import version_info
 from warnings import filterwarnings
@@ -70,14 +69,14 @@ string_tests = [
     ("ppm", b"P6\r"),
     ("ppm", b"P6\t"),
     ("rast", b"\x59\xA6\x6A\x95"),
+    ("rgb", b"\001\332"),
     # ("tiff", b"II"),  # unhexlify(b'4949')
     # ("tiff", b"I I"),  # unhexlify(b'492049')
     ("tiff", b"II*\x00"),  # unhexlify(b'49492a00')
-    ("tiff", b"II\\x2a\\x00"),  # unhexlify(b'49495c7832615c783030')
     ("tiff", b"MM\x00*"),  # unhexlify(b'4d4d002a')
     ("tiff", b"MM\x00+"),  # unhexlify(b'4d4d002b')
-    ("tiff", b"MM\\x00\\x2a"),  # unhexlify(b'4d4d5c7830305c783261')
     ("webp", b"RIFF____WEBP"),
+    ("xbm", b"#define "),
     (None, "decafbad"),
     (None, b"decafbad"),
 ]
@@ -104,7 +103,7 @@ def test_what_from_string_py311(expected, h):
     These tests fail with imghdr on Python < 3.11.
     """
     if isinstance(h, str):  # In imgdir.what() h must be bytes, not str.
-        h = unhexlify(h)  # bytes.fromhex(h)
+        h = bytes.fromhex(h)
     assert what(None, h) == expected
     if version_info < (3, 11):  # TODO: Document these imghdr fails
         expected = None
@@ -115,12 +114,12 @@ def test_what_from_string_py311(expected, h):
 @pytest.mark.parametrize(
     "expected, h",
     [
-        ("jpeg", b"______JFIF"),
         ("jpeg", b"______Exif"),
-        ("rgb", b"\001\332"),
+        ("jpeg", b"______JFIF"),
         ("tiff", b"II"),
+        ("tiff", b"II\\x2a\\x00"),  # unhexlify(b'49495c7832615c783030')
         ("tiff", b"MM"),
-        ("xbm", b"#define "),
+        ("tiff", b"MM\\x00\\x2a"),  # unhexlify(b'4d4d5c7830305c783261')
     ],
 )
 def test_what_from_string_todo(expected, h):

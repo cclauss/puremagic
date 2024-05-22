@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import os
 import json
-import binascii
 from itertools import chain
 from collections import namedtuple
 from typing import Union, Tuple, List, Dict, Optional
@@ -85,20 +84,13 @@ def _magic_data(
     extensions = [_create_puremagic(x) for x in data["extension_only"]]
     multi_part_extensions = {}
     for file_match, option_list in data["multi-part"].items():
-        multi_part_extensions[binascii.unhexlify(file_match.encode("ascii"))] = [
-            _create_puremagic(x) for x in option_list
-        ]
+        multi_part_extensions[bytes.fromhex(file_match)] = [_create_puremagic(x) for x in option_list]
     return headers, footers, extensions, multi_part_extensions
 
 
 def _create_puremagic(x: list) -> PureMagic:
-    return PureMagic(
-        byte_match=binascii.unhexlify(x[0].encode("ascii")),
-        offset=x[1],
-        extension=x[2],
-        mime_type=x[3],
-        name=x[4],
-    )
+    x[0] = bytes.fromhex(x[0])
+    return PureMagic(*x)
 
 
 magic_header_array, magic_footer_array, extension_only_array, multi_part_dict = _magic_data()
